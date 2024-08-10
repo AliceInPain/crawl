@@ -1,3 +1,4 @@
+from pprint import pprint
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -10,7 +11,7 @@ def fetch_data(url):
     links = []
     images = []
     prices = []
-    descs = []
+    description = []
 
     # Get all the titles with h1
     title_tag = soup.find(["h1"])
@@ -28,12 +29,31 @@ def fetch_data(url):
     for tag in soup.find_all('p', class_="price"):
         prices.append(tag.get_text(strip=True))
 
-  
+    page_description = {}
+    # to get description
+    div_tag = soup.find("div", id="tab-description")
+    # print(div_tag)
+    if div_tag:
+        h2_tags = div_tag.find_all("h2")
+        for index, h2 in enumerate(h2_tags, start=1):
+            key = f"h2_{index}"
+            page_description[key] = h2.get_text()
+            
+        h3_tags = div_tag.find_all("h3")
+        for index, h3 in enumerate(h3_tags, start=1):
+            key = f"h3_{index}"
+            page_description[key] = h3.get_text()
+            
+        # description[0] = page_description
+        description = [(k,v) for k,v in page_description.items()]
+        # print(description)
+
     return {
         "title": titles,
         "image": images,
         "price": prices,
-        "link": links
+        "link": links,
+        "description": description
     }
 
 
@@ -47,8 +67,9 @@ urls = {
 data = {}
 
 for website, url in urls.items():
+
     data[website] = fetch_data(url)
-# print(data)
+pprint(data)
 
 
 # text file
@@ -85,7 +106,7 @@ df = pd.DataFrame(rows)
 # Save  DataFrame to a CSV file
 df.to_csv('scrapped.csv', index=False)
 
-print("Data has been successfully written to 'scrapped.csv'")
+# print("Data has been successfully written to 'scrapped.csv'")
 
 
 # Write the data to a text file in a readable format
@@ -97,4 +118,4 @@ with open(text_file, "w", encoding="utf-8") as file:
             break  # to stop the loop
         file.write("\n")
 
-print(f"Data has been written to {text_file}")
+# print(f"Data has been written to {text_file}")
