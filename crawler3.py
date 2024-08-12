@@ -48,7 +48,7 @@ def fetch_data(url):
         for index, img in enumerate(img_tags, start=1):
             key = f"img_{index}"
             page_description[key] = img.get("src")
-        descriptions = [(k, v) for k, v in page_description.items()]
+        descriptions = list(page_description.items())
         # print(descriptions)
 
     # to get tables
@@ -64,8 +64,8 @@ def fetch_data(url):
                 key = th_tag.get_text(strip=True)
                 value = td_tag.get_text(strip=True)
                 page_table[key] = value
-    tables = [(k, v) for k, v in page_table.items()]
-    # pprint(tables)
+    tables = list(page_table.items())
+    pprint(tables)
 
     return {
         "title": titles,
@@ -89,7 +89,7 @@ data = {}
 for website, url in urls.items():
 
     data[website] = fetch_data(url)
-pprint(data)
+# pprint(data)
 
 
 # text file
